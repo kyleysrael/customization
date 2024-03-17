@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  box-sizing: border-box;
+  text-decoration: unset;
+  color: #000000;
+  font-family: Roboto, sans-serif;
+  --swiper-navigation-size: 20px;
+  --swiper-navigation-color: black;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+body {
+  background: #aaaaaa !important;
+}
