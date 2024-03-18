@@ -1,16 +1,14 @@
-import ColorPicker from "@/components/ColorPicker";
 import ContentWrapper from "@/components/ContentWrapper/ContentWrapper";
 import { COLORS } from "@/constant/theme";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense, useRef, useState } from "react";
-import { Mesh, BoxGeometry, MeshStandardMaterial, Group } from "three";
+import { Group } from "three";
 import Laces from "@/components/Laces";
 import Swiper from "swiper";
 import Button from "@/constant/Button";
 import Image from "next/image";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import * as THREE from "three";
-import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { Loader } from "@/components/Loader";
 
 const Materials = [
   "Laces",
@@ -23,17 +21,12 @@ const Materials = [
   "Patch",
 ];
 
-interface Nodes {
-  [key: string]: THREE.Mesh;
-}
-
 export function Model({ customColors }: any) {
   const group = useRef<Group | null>(null);
   const gltf = useGLTF("/shoe.gltf");
   const nodes: any = gltf.nodes || {};
   const materials = gltf.materials;
 
-  // Define default colors for each material
   const defaultColors = {
     laces: "none", // Default color for laces
     mesh: "none", // Default color for mesh
@@ -44,12 +37,10 @@ export function Model({ customColors }: any) {
     band: "none", // Default color for band
     patch: "none", // Default color for patch
   };
-
-  // Merge default colors with custom colors
   const mergedColors = { ...defaultColors, ...customColors };
 
   return (
-    <group ref={group}>
+    <group ref={group} scale={4}>
       <mesh
         geometry={nodes.shoe.geometry}
         material={materials.laces}
@@ -117,7 +108,6 @@ const Index = () => {
     setDropdownOpen(false);
   };
 
-  const mesh = useRef<Mesh<BoxGeometry, MeshStandardMaterial>>(null);
   const swiperRef = useRef<any>(null);
 
   const handleSlideChange = (swiper: any) => {
@@ -134,14 +124,18 @@ const Index = () => {
     <ContentWrapper>
       <div style={styles.CanvasWrapper}>
         <Canvas>
-          <Suspense fallback={null}>
+          <color attach="background" args={["#101010"]} />
+          <Suspense fallback={<Loader />}>
             <ambientLight />
+            <hemisphereLight intensity={4} groundColor={"black"} />
+            <pointLight intensity={3} />
             <spotLight
               intensity={0.9}
               angle={0.1}
               penumbra={1}
               position={[10, 15, 10]}
               castShadow
+              shadow-mapSize={1024}
             />
             <Model customColors={{ [material.toLowerCase()]: pickedColor }} />
             <OrbitControls enablePan enableZoom enableRotate />
