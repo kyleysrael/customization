@@ -1,7 +1,6 @@
 import React from "react";
 import { Html, useProgress } from "@react-three/drei";
 
-// Loader component
 export const Loader = () => {
   const { progress } = useProgress();
   return (
@@ -17,9 +16,10 @@ export const Loader = () => {
           color: "#ffffff",
           fontSize: "18px",
           fontWeight: "bold",
+          zIndex: "5",
         }}
       >
-        <span>Loading {progress.toFixed(2)}%</span>
+        <span style={{ color: "white" }}>Loading {progress.toFixed(2)}%</span>
       </div>
     </Html>
   );

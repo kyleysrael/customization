@@ -2,13 +2,19 @@ import ContentWrapper from "@/components/ContentWrapper/ContentWrapper";
 import { COLORS } from "@/constant/theme";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense, useRef, useState } from "react";
-import { Group } from "three";
 import Laces from "@/components/Laces";
 import Swiper from "swiper";
 import Button from "@/constant/Button";
 import Image from "next/image";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import {
+  MeshReflectorMaterial,
+  OrbitControls,
+  PresentationControls,
+  Stage,
+  useGLTF,
+} from "@react-three/drei";
 import { Loader } from "@/components/Loader";
+import { Model } from "@/components/Model";
 
 const Materials = [
   "Laces",
@@ -20,70 +26,6 @@ const Materials = [
   "Band",
   "Patch",
 ];
-
-export function Model({ customColors }: any) {
-  const group = useRef<Group | null>(null);
-  const gltf = useGLTF("/shoe.gltf");
-  const nodes: any = gltf.nodes || {};
-  const materials = gltf.materials;
-
-  const defaultColors = {
-    laces: "none", // Default color for laces
-    mesh: "none", // Default color for mesh
-    caps: "none", // Default color for caps
-    inner: "none", // Default color for inner
-    sole: "none", // Default color for sole
-    stripes: "none", // Default color for stripes
-    band: "none", // Default color for band
-    patch: "none", // Default color for patch
-  };
-  const mergedColors = { ...defaultColors, ...customColors };
-
-  return (
-    <group ref={group} scale={4}>
-      <mesh
-        geometry={nodes.shoe.geometry}
-        material={materials.laces}
-        material-color={mergedColors.laces}
-      />
-      <mesh
-        geometry={nodes.shoe_1.geometry}
-        material={materials.mesh}
-        material-color={mergedColors.mesh}
-      />
-      <mesh
-        geometry={nodes.shoe_2.geometry}
-        material={materials.caps}
-        material-color={mergedColors.caps}
-      />
-      <mesh
-        geometry={nodes.shoe_3.geometry}
-        material={materials.inner}
-        material-color={mergedColors.inner}
-      />
-      <mesh
-        geometry={nodes.shoe_4.geometry}
-        material={materials.sole}
-        material-color={mergedColors.sole}
-      />
-      <mesh
-        geometry={nodes.shoe_5.geometry}
-        material={materials.stripes}
-        material-color={mergedColors.stripes}
-      />
-      <mesh
-        geometry={nodes.shoe_6.geometry}
-        material={materials.band}
-        material-color={mergedColors.band}
-      />
-      <mesh
-        geometry={nodes.shoe_7.geometry}
-        material={materials.patch}
-        material-color={mergedColors.patch}
-      />
-    </group>
-  );
-}
 
 useGLTF.preload("/shoe.gltf");
 
@@ -123,8 +65,9 @@ const Index = () => {
   return (
     <ContentWrapper>
       <div style={styles.CanvasWrapper}>
-        <Canvas>
+        <Canvas dpr={[1, 2]} shadows camera={{ fov: 45 }}>
           <color attach="background" args={["#101010"]} />
+          <fog attach="fog" args={["#101010", 10, 20]} />
           <Suspense fallback={<Loader />}>
             <ambientLight />
             <hemisphereLight intensity={4} groundColor={"black"} />
@@ -137,8 +80,37 @@ const Index = () => {
               castShadow
               shadow-mapSize={1024}
             />
-            <Model customColors={{ [material.toLowerCase()]: pickedColor }} />
-            <OrbitControls enablePan enableZoom enableRotate />
+            <PresentationControls
+              speed={1.5}
+              global
+              zoom={0.7}
+              polar={[0.3, Math.PI / 4]}
+            >
+              <group position={[0, 2, 0]}>
+                <Stage environment={null} intensity={1}>
+                  <Model
+                    scale={4}
+                    customColors={{ [material.toLowerCase()]: pickedColor }}
+                  />
+                </Stage>
+              </group>
+              <mesh rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[170, 170]} />
+                <MeshReflectorMaterial
+                  blur={[300, 100]}
+                  resolution={2048}
+                  mixBlur={1}
+                  mixStrength={40}
+                  roughness={1}
+                  depthScale={1.2}
+                  minDepthThreshold={0.4}
+                  maxDepthThreshold={1.4}
+                  color="#101010"
+                  metalness={0.5}
+                  mirror={1}
+                />
+              </mesh>
+            </PresentationControls>
           </Suspense>
         </Canvas>
       </div>
